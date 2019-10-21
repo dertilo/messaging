@@ -24,8 +24,8 @@ services:
     image: rabbitmq:3-management
     hostname: rabbitmq
     ports:
-       - "8080:15672"  # management port (guest:guest)
-#       - "5673:5672"   # amqp port
+       - "15672:15672"  # management port (guest:guest)
+       - "5672:5672"   # amqp port
     networks:
       - 'default'
 networks:
