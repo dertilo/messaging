@@ -1,0 +1,32 @@
+version: '3'
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile_consumer
+    image: consumer
+    networks:
+      - 'default'
+    depends_on:
+      - rabbitmq
+
+  producer:
+    build:
+      context: .
+      dockerfile: Dockerfile_producer
+    image: producer
+    networks:
+      - 'default'
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    ports:
+       - "8080:15672"  # management port (guest:guest)
+#       - "5673:5672"   # amqp port
+    networks:
+      - 'default'
+networks:
+  default:
