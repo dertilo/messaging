@@ -6,6 +6,12 @@ import pika
 import uuid
 
 from pikautil.pika_util import build_blocking_connection_with_retry
+counter = 0
+def get_id():
+    global counter
+    counter+=1
+    return str(counter) # just for readablity in this examle
+    # return str(uuid.uuid4())
 
 if __name__ == '__main__':
 
@@ -17,7 +23,7 @@ if __name__ == '__main__':
             callback_queue = result.method.queue
 
 
-            id_tasks = [(str(uuid.uuid4()),k) for k in range(9)]
+            id_tasks = [(get_id(),k) for k in range(8)]
             random.shuffle(id_tasks)
 
             for eid, task in id_tasks:
