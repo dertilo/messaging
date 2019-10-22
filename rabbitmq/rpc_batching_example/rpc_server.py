@@ -2,6 +2,7 @@
 inspired by https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/rpc_server.py
 '''
 import sys
+import time
 
 import pika
 from pikautil.pika_util import build_blocking_connection_with_retry
@@ -11,28 +12,18 @@ with build_blocking_connection_with_retry() as connection:
 
         channel.queue_declare(queue='rpc_queue')
 
-        def fib(n):
-            if n == 0:
-                return 0
-            elif n == 1:
-                return 1
-            else:
-                return fib(n - 1) + fib(n - 2)
-
-
         def on_request(ch, method, props, body):
             n = int(body)
-
-            print(" [.] fib(%s)" % n)
+            time.sleep(n)
+            print('working on task: %s'%props.correlation_id)
             sys.stdout.flush()
 
-            response = fib(n)
+            response = "task %s took %d seconds" % (props.correlation_id, n)
 
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
-                             properties=pika.BasicProperties(correlation_id = \
-                                                                 props.correlation_id),
-                             body=str(response))
+                             properties=pika.BasicProperties(correlation_id = props.correlation_id),
+                             body=response)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
