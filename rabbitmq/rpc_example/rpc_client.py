@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 '''
-stolen from: https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/rpc_client.py
+inspired by: https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/rpc_client.py
 '''
 import sys
 
 import pika
 import uuid
 
-from util import build_blocking_connection_with_retry
+from pikautil.pika_util import build_blocking_connection_with_retry
 
 class FibonacciRpcClient(object):
 

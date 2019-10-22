@@ -4,7 +4,8 @@ inspired by https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/rp
 import sys
 
 import pika
-from util import build_blocking_connection_with_retry
+from pikautil.pika_util import build_blocking_connection_with_retry
+
 with build_blocking_connection_with_retry() as connection:
     with connection.channel() as channel:
 
