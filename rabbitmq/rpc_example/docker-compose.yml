@@ -3,8 +3,8 @@ services:
 
   image_builder:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: rabbitmq/rpc_example/Dockerfile
     image: pika_python
 
   server:
