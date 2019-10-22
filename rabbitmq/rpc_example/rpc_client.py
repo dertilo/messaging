@@ -2,15 +2,17 @@
 '''
 stolen from: https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/rpc_client.py
 '''
+import sys
+
 import pika
 import uuid
+
+from util import build_blocking_connection_with_retry
 
 class FibonacciRpcClient(object):
 
     def __init__(self):
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='localhost'))
-
+        self.connection = build_blocking_connection_with_retry()
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(queue='', exclusive=True)
@@ -46,3 +48,4 @@ fibonacci_rpc = FibonacciRpcClient()
 print(" [x] Requesting fib(30)")
 response = fibonacci_rpc.call(30)
 print(" [.] Got %r" % response)
+sys.stdout.flush()

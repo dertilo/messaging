@@ -1,0 +1,39 @@
+version: '3'
+services:
+
+  image_builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pika_python
+
+  server:
+    image: pika_python
+    networks:
+      - 'default'
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/root
+    command: [ "python","rpc_server.py" ]
+
+  client:
+    image: pika_python
+    networks:
+      - 'default'
+    depends_on:
+      - rabbitmq
+    volumes:
+      - .:/root
+    command: [ "python", "rpc_client.py" ]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    ports:
+       - "15672:15672"  # management port (guest:guest)
+       - "5672:5672"   # amqp port
+    networks:
+      - 'default'
+networks:
+  default:

@@ -1,42 +1,43 @@
-#!/usr/bin/env python
 '''
-stolen from https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/rpc_server.py
+inspired by https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/python/rpc_server.py
 '''
+import sys
+
 import pika
+from util import build_blocking_connection_with_retry
+with build_blocking_connection_with_retry() as connection:
+    with connection.channel() as channel:
 
-connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+        channel.queue_declare(queue='rpc_queue')
 
-channel = connection.channel()
-
-channel.queue_declare(queue='rpc_queue')
-
-
-def fib(n):
-    if n == 0:
-        return 0
-    elif n == 1:
-        return 1
-    else:
-        return fib(n - 1) + fib(n - 2)
+        def fib(n):
+            if n == 0:
+                return 0
+            elif n == 1:
+                return 1
+            else:
+                return fib(n - 1) + fib(n - 2)
 
 
-def on_request(ch, method, props, body):
-    n = int(body)
+        def on_request(ch, method, props, body):
+            n = int(body)
 
-    print(" [.] fib(%s)" % n)
-    response = fib(n)
+            print(" [.] fib(%s)" % n)
+            sys.stdout.flush()
 
-    ch.basic_publish(exchange='',
-                     routing_key=props.reply_to,
-                     properties=pika.BasicProperties(correlation_id = \
-                                                         props.correlation_id),
-                     body=str(response))
-    ch.basic_ack(delivery_tag=method.delivery_tag)
+            response = fib(n)
+
+            ch.basic_publish(exchange='',
+                             routing_key=props.reply_to,
+                             properties=pika.BasicProperties(correlation_id = \
+                                                                 props.correlation_id),
+                             body=str(response))
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(queue='rpc_queue', on_message_callback=on_request)
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(queue='rpc_queue', on_message_callback=on_request)
 
-print(" [x] Awaiting RPC requests")
-channel.start_consuming()
+        print(" [x] Awaiting RPC requests")
+        sys.stdout.flush()
+        channel.start_consuming()
