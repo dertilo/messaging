@@ -4,30 +4,10 @@ from time import sleep, time
 import pika
 import sys
 
-sleep(10)
-
-
-def setup_connection():
-    connection = None
-    for k in range(9):
-        sleep(3)
-        print("try to connect: %d" % k)
-        try:
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host="rabbitmq")
-            )
-            break
-        except:
-            pass
-
-    if connection is None:
-        raise Exception("could not connect to rabbitmq")
-    else:
-        return connection
-
+from pikautil.pika_util import build_blocking_connection_with_retry
 
 if __name__ == "__main__":
-    connection = setup_connection()
+    connection = build_blocking_connection_with_retry()
     channel = connection.channel()
 
     q = channel.queue_declare(queue="task_queue", durable=True)
